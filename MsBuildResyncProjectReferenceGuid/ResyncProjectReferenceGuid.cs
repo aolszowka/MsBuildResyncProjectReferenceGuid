@@ -7,6 +7,7 @@
 namespace MsBuildResyncProjectReferenceGuid
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
@@ -15,9 +16,9 @@ namespace MsBuildResyncProjectReferenceGuid
 
     static class ResyncProjectReferenceGuid
     {
-        public static bool Execute(string targetDirectory, bool saveModifications)
+        public static IEnumerable<string> Execute(string targetDirectory, bool saveModifications)
         {
-            bool changesMade = false;
+            ConcurrentBag<string> modifiedProjects = new ConcurrentBag<string>();
 
             IEnumerable<string> projectsToResync = GetProjectsInDirectory(targetDirectory);
 
@@ -25,12 +26,12 @@ namespace MsBuildResyncProjectReferenceGuid
             {
                 if (ResyncProjectReference(projectToResync, saveModifications))
                 {
-                    changesMade = true;
+                    modifiedProjects.Add(projectToResync);
                 }
             }
             );
 
-            return changesMade;
+            return modifiedProjects;
         }
 
         static bool ResyncProjectReference(string pathToProject, bool saveModifications)
@@ -74,6 +75,10 @@ namespace MsBuildResyncProjectReferenceGuid
                 }
                 catch
                 {
+                    // TODO: Race Condition (Consider Project Being Read for its GUID while trying to fix it)
+                    // There is a pretty bad race condition bug here
+                    // just sleep to forget it for now, no time to fix
+                    // this bug.
                     System.Threading.Thread.Sleep(30000);
                     projXml.Save(pathToProject);
                 }
@@ -90,7 +95,7 @@ namespace MsBuildResyncProjectReferenceGuid
         /// <returns>All projects that this tool supports.</returns>
         static IEnumerable<string> GetProjectsInDirectory(string targetDirectory)
         {
-            HashSet<string> supportedFileExtensions = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase) { ".csproj", ".vbproj", ".synproj" };
+            HashSet<string> supportedFileExtensions = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase) { ".csproj", ".vbproj", ".synproj", ".fsproj" };
 
             return
                 Directory
