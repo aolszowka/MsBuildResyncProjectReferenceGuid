@@ -99,6 +99,7 @@ namespace MsBuildResyncProjectReferenceGuid
             {
                 ".csproj",
                 ".fsproj",
+                ".sqlproj",
                 ".synproj",
                 ".vbproj",
             };
