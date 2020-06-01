@@ -46,7 +46,7 @@ namespace MsBuildResyncProjectReferenceGuid
 
             foreach (XElement projectReference in projectReferences)
             {
-                string existingGuid = MSBuildUtilities.GetProjectReferenceGUID(projectReference, pathToProject);
+                string existingGuid = MSBuildUtilities.GetOrCreateProjectReferenceGUID(projectReference, pathToProject);
                 string prRelativePath = MSBuildUtilities.GetProjectReferenceIncludeValue(projectReference, pathToProject);
                 string prActualPath = PathUtilities.ResolveRelativePath(projectDirectory, prRelativePath);
 

@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="MSBuildUtilities.cs" company="Ace Olszowka">
-//  Copyright (c) Ace Olszowka 2018. All rights reserved.
+//  Copyright (c) Ace Olszowka 2018-2020. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -40,14 +40,14 @@ namespace MsBuildResyncProjectReferenceGuid
             return projXml.Descendants(msbuildNS + "ProjectReference");
         }
 
-        public static string GetProjectReferenceGUID(XElement projectReference, string projectPath)
+        public static string GetOrCreateProjectReferenceGUID(XElement projectReference, string projectPath)
         {
             // Get the existing Project Reference GUID
             XElement projectReferenceGuidElement = projectReference.Descendants(msbuildNS + "Project").FirstOrDefault();
             if (projectReferenceGuidElement == null)
             {
-                string exception = $"A ProjectReference in {projectPath} does not contain a Project Element; this is invalid.";
-                throw new InvalidOperationException(exception);
+                projectReferenceGuidElement = new XElement(msbuildNS + "Project", string.Empty);
+                projectReference.Add(projectReferenceGuidElement);
             }
 
             // This is the referenced project
