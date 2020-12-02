@@ -15,7 +15,6 @@ namespace MsBuildResyncProjectReferenceGuid
     {
         internal static XNamespace msbuildNS = @"http://schemas.microsoft.com/developer/msbuild/2003";
 
-
         /// <summary>
         /// Extracts the Project GUID from the specified proj File.
         /// </summary>
@@ -56,27 +55,6 @@ namespace MsBuildResyncProjectReferenceGuid
             return projectReferenceGuid;
         }
 
-        public static string GetProjectReferenceName(XElement projectReference, string projectPath)
-        {
-            // Get the existing Project Reference Name
-            XElement projectReferenceNameElement = projectReference.Descendants(msbuildNS + "Name").FirstOrDefault();
-            if (projectReferenceNameElement == null)
-            {
-                string exception = $"A ProjectReference in {projectPath} does not contain a Name Element; this is invalid.";
-                throw new InvalidOperationException(exception);
-            }
-
-            // This is the referenced project
-            string projectReferenceName = projectReferenceNameElement.Value;
-
-            return projectReferenceName;
-        }
-
-        public static void SetProjectReferenceName(XElement projectReference, string name)
-        {
-            projectReference.Descendants(msbuildNS + "Name").First().SetValue(name);
-        }
-
         public static void SetProjectReferenceGUID(XElement projectReference, string projectGuid)
         {
             string cleanProjectGuid = Guid.Parse(projectGuid).ToString("B").ToUpperInvariant();
@@ -98,14 +76,6 @@ namespace MsBuildResyncProjectReferenceGuid
             string projectReferenceInclude = projectReferenceIncludeAttribute.Value;
 
             return projectReferenceInclude;
-        }
-
-        public static void SetProjectReferenceIncludeValue(XElement projectReference, string includeValue)
-        {
-            // Fix up the slashes to be Windows Slashes
-            includeValue = includeValue.Replace('/', '\\');
-
-            projectReference.Attribute("Include").SetValue(includeValue);
         }
 
     }
