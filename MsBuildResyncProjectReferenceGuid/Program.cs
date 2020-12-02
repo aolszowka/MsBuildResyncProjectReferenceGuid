@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="Program.cs" company="Ace Olszowka">
-//  Copyright (c) Ace Olszowka 2018. All rights reserved.
+//  Copyright (c) Ace Olszowka 2018-2020. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -9,87 +9,62 @@ namespace MsBuildResyncProjectReferenceGuid
     using System;
     using System.IO;
     using System.Linq;
-    using System.Text;
+
+    using MsBuildResyncProjectReferenceGuid.Properties;
+
+    using NDesk.Options;
 
     class Program
     {
         static void Main(string[] args)
         {
-            int errorCode = 0;
+            string targetDirectory = string.Empty;
+            bool validateOnly = false;
+            bool showHelp = false;
 
-            if (args.Any())
+            OptionSet p = new OptionSet()
             {
-                string command = args.First().ToLowerInvariant();
+                { "<>", Strings.TargetDirectoryDescription, v => targetDirectory = v },
+                { "validate", Strings.ValidateDescription, v => validateOnly = v != null },
+                { "?|h|help", Strings.HelpDescription, v => showHelp = v != null },
+            };
 
-                if (command.Equals("-?") || command.Equals("/?") || command.Equals("-help") || command.Equals("/help"))
-                {
-                    errorCode = ShowUsage();
-                }
-                else if (command.Equals("validatedirectory"))
-                {
-                    if (args.Length < 2)
-                    {
-                        string error = string.Format("You must provide a directory as a second argument to use validatedirectory");
-                        Console.WriteLine(error);
-                        errorCode = 1;
-                    }
-                    else
-                    {
-                        // The second argument is a directory
-                        string directoryArgument = args[1];
+            try
+            {
+                p.Parse(args);
+            }
+            catch (OptionException)
+            {
+                Console.WriteLine(Strings.ShortUsageMessage);
+                Console.WriteLine($"Try `--help` for more information.");
+                Environment.ExitCode = 160;
+                return;
+            }
 
-                        if (Directory.Exists(directoryArgument))
-                        {
-                            errorCode = PrintToConsole(args[1], false);
-                        }
-                        else
-                        {
-                            string error = string.Format("The provided directory `{0}` is invalid.", directoryArgument);
-                            errorCode = 9009;
-                        }
-                    }
-                }
-                else
-                {
-                    if (Directory.Exists(command))
-                    {
-                        string targetPath = command;
-                        PrintToConsole(targetPath, true);
-                        errorCode = 0;
-                    }
-                    else
-                    {
-                        string error = string.Format("The specified path `{0}` is not valid.", command);
-                        Console.WriteLine(error);
-                        errorCode = 1;
-                    }
-                }
+            if (showHelp || string.IsNullOrEmpty(targetDirectory))
+            {
+                ShowUsage(p);
+            }
+            else if (!Directory.Exists(targetDirectory))
+            {
+                Console.WriteLine(Strings.InvalidTargetArgument, targetDirectory);
+                Environment.ExitCode = 9009;
             }
             else
             {
-                // This was a bad command
-                errorCode = ShowUsage();
+                Environment.ExitCode = PrintToConsole(targetDirectory, validateOnly == false);
             }
-
-            Environment.Exit(errorCode);
         }
 
-        private static int ShowUsage()
+        private static int ShowUsage(OptionSet p)
         {
-            StringBuilder message = new StringBuilder();
-            message.AppendLine("Scans given directory for MsBuild Projects; Resycing the ProjectReference Project Guid to the referenced Project.");
-            message.AppendLine("Invalid Command/Arguments. Valid commands are:");
-            message.AppendLine();
-            message.AppendLine("[directory]                   - [MODIFIES] Spins through the specified directory\n" +
-                               "                                and all subdirectories for Project files resetting\n" +
-                               "                                the ProjectReference Project tag. Prints modified\n" +
-                               "                                paths. ALWAYS Returns 0.");
-            message.AppendLine("validatedirectory [directory] - [READS] Spins through the specified directory\n" +
-                               "                                and all subdirectories for Project files prints\n" +
-                               "                                all projects whose ProjectReference Project tags\n" +
-                               "                                should be updated. Returns the number of invalid projects.");
-            Console.WriteLine(message);
-            return 21;
+            Console.WriteLine(Strings.ShortUsageMessage);
+            Console.WriteLine();
+            Console.WriteLine(Strings.LongDescription);
+            Console.WriteLine();
+            Console.WriteLine($"               <>            {Strings.TargetDirectoryDescription}");
+            p.WriteOptionDescriptions(Console.Out);
+            return 160;
         }
 
         static int PrintToConsole(string targetDirectory, bool saveModifications)

@@ -1,5 +1,7 @@
 # MsBuildResyncProjectReferenceGuid
-Resyncs the Project Reference Guid to what is in the referenced project
+![CI - Master](https://github.com/aolszowka/MsBuildResyncProjectReferenceGuid/workflows/CI/badge.svg?branch=master)
+
+Resyncs the Project Reference Guid to what is in the referenced project.
 
 ## Background
 In a large source tree it is very possible to get into a situation where the Guid of the Referenced Project has changed.
@@ -21,24 +23,27 @@ As a side effect of this process if the Project that is referenced in ProjectRef
 If the project was completely deleted you should remove the reference all together to avoid MsBuild becoming confused and attempting to build something that does not exist.
 
 ## Usage
-```text
-Scans given directory for MsBuild Projects; Resycing the ProjectReference Project Guid to the referenced Project.
-Invalid Command/Arguments. Valid commands are:
+There are now two ways to run this tool:
 
-[directory]                   - [MODIFIES] Spins through the specified directory
-                                and all subdirectories for Project files resetting
-                                the ProjectReference Project tag. Prints modified
-                                paths. ALWAYS Returns 0.
-validatedirectory [directory] - [READS] Spins through the specified directory
-                                and all subdirectories for Project files prints
-                                all projects whose ProjectReference Project tags
-                                should be updated. Returns the number of invalid projects.
+1. (Compiled Executable) Invoke the tool via `MsBuildResyncProjectReferenceGuid` and pass the arguments.
+2. (Dotnet Tool) Install this tool using the following command `dotnet tool install MsBuildResyncProjectReferenceGuid` (assuming that you have the nuget package in your feed) then invoke it via `dotnet project-resyncprojectguid`
+
+```text
+Usage: C:\ProjectDirectory\ [-validate]
+
+Scans given directory for MsBuild Projects; Resycing the ProjectReference
+Project Guid to the referenced Project.
+
+               <>            The directory to scan for MSBuild Projects
+      --validate             Indicates if this tool should only be run in
+                               validation mode
+  -?, -h, --help             Show this message and exit
 ```
 
 ## Hacking
 The most likely change you will want to make is changing the supported project files. In theory this tool should support any MSBuild Project Format that utilizes a ProjectGuid.
 
-See ResyncProjectReferenceGuid.GetProjectsInDirectory(string) for the place to modify this.
+See `ResyncProjectReferenceGuid.GetProjectsInDirectory(string)` for the place to modify this.
 
 The tool should also support those projects that utilize the same ProjectReference format as CSPROJ formats.
 
@@ -47,3 +52,6 @@ Pull requests and bug reports are welcomed so long as they are MIT Licensed.
 
 ## License
 This tool is MIT Licensed.
+
+## Third Party Licenses
+This project uses other open source contributions see [LICENSES.md](LICENSES.md) for a comprehensive listing.
