@@ -1,4 +1,6 @@
 # MsBuildResyncProjectReferenceGuid
+![CI - Master](https://github.com/aolszowka/MsBuildResyncProjectReferenceGuid/workflows/CI/badge.svg?branch=master)
+
 Resyncs the Project Reference Guid to what is in the referenced project
 
 ## Background
