@@ -22,17 +22,15 @@ If the project was completely deleted you should remove the reference all togeth
 
 ## Usage
 ```text
-Scans given directory for MsBuild Projects; Resycing the ProjectReference Project Guid to the referenced Project.
-Invalid Command/Arguments. Valid commands are:
+Usage: C:\ProjectDirectory\ [-validate]
 
-[directory]                   - [MODIFIES] Spins through the specified directory
-                                and all subdirectories for Project files resetting
-                                the ProjectReference Project tag. Prints modified
-                                paths. ALWAYS Returns 0.
-validatedirectory [directory] - [READS] Spins through the specified directory
-                                and all subdirectories for Project files prints
-                                all projects whose ProjectReference Project tags
-                                should be updated. Returns the number of invalid projects.
+Scans given directory for MsBuild Projects; Resycing the ProjectReference
+Project Guid to the referenced Project.
+
+               <>            The directory to scan for MSBuild Projects
+      --validate             Indicates if this tool should only be run in
+                               validation mode
+  -?, -h, --help             Show this message and exit
 ```
 
 ## Hacking
@@ -47,3 +45,6 @@ Pull requests and bug reports are welcomed so long as they are MIT Licensed.
 
 ## License
 This tool is MIT Licensed.
+
+## Third Party Licenses
+This project uses other open source contributions see [LICENSES.md](LICENSES.md) for a comprehensive listing.
