@@ -42,13 +42,13 @@ namespace MsBuildResyncProjectReferenceGuid
 
             IEnumerable<XElement> projectReferences = MSBuildUtilities.GetProjectReferenceNodes(projXml);
 
-            string projectDirectory = PathUtilities.AddTrailingSlash(Path.GetDirectoryName(pathToProject));
+            string projectDirectory = Path.GetDirectoryName(pathToProject);
 
             foreach (XElement projectReference in projectReferences)
             {
                 string existingGuid = MSBuildUtilities.GetOrCreateProjectReferenceGUID(projectReference, pathToProject);
                 string prRelativePath = MSBuildUtilities.GetProjectReferenceIncludeValue(projectReference, pathToProject);
-                string prActualPath = PathUtilities.ResolveRelativePath(projectDirectory, prRelativePath);
+                string prActualPath = Path.GetFullPath(Path.Combine(projectDirectory, prRelativePath));
 
                 // If the referenced project doesn't exist throw an exception
                 if (!File.Exists(prActualPath))
